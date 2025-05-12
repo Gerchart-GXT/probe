@@ -3,7 +3,7 @@ import json
 import threading
 from Logger import Logger
 
-class Database:
+class ASDatabase:
     def __init__(self, db_path: str, logger: Logger):
         """
         初始化 Database 类。
@@ -141,3 +141,41 @@ class Database:
                 self.logger.info(f"Updated server status: {status} (ID: {server_id})")
             except sqlite3.Error as e:
                 self.logger.error(f"Error updating server status: {e}")
+
+    def get_servers(self):
+        """
+        返回已记录的服务器信息。
+
+        :return: 服务器信息列表
+        """
+        with self.lock:  # 加锁
+            try:
+                self.cursor.execute("SELECT * FROM servers")
+                servers = self.cursor.fetchall()
+                self.logger.info("Fetched server records")
+                return servers
+            except sqlite3.Error as e:
+                self.logger.error(f"Error fetching server records: {e}")
+                return []
+
+    def get_performance_data(self, server_id: int, start_time: str, end_time: str):
+        """
+        返回指定时间戳范围内的性能记录信息。
+
+        :param server_id: 服务器 ID
+        :param start_time: 开始时间（格式：'YYYY-MM-DD HH:MM:SS'）
+        :param end_time: 结束时间（格式：'YYYY-MM-DD HH:MM:SS'）
+        :return: 性能数据列表
+        """
+        with self.lock:  # 加锁
+            try:
+                self.cursor.execute("""
+                    SELECT * FROM performance_data
+                    WHERE server_id = ? AND timestamp BETWEEN ? AND ?
+                """, (server_id, start_time, end_time))
+                performance_data = self.cursor.fetchall()
+                self.logger.info(f"Fetched performance data for server ID: {server_id} between {start_time} and {end_time}")
+                return performance_data
+            except sqlite3.Error as e:
+                self.logger.error(f"Error fetching performance data: {e}")
+                return []

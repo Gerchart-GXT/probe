@@ -4,9 +4,6 @@ from SystemInfoCollector import SystemInfoCollector
 
 import asyncio
 import json
-import threading
-import time
-from collections import deque
 from SystemInfoCollector import SystemInfoCollector
 from WebSocketUploader import WebSocketUploader
 

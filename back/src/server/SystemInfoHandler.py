@@ -1,7 +1,7 @@
 import asyncio
 import json
 from Logger import Logger
-from Database import Database  # 假设 Database 类在 Database.py 文件中
+from ASDatebase import ASDatabase  # 假设 Database 类在 Database.py 文件中
 
 class SystemInfoHandler:
     def __init__(self, data_queue: asyncio.Queue, db_path: str, logger: Logger):
@@ -15,7 +15,7 @@ class SystemInfoHandler:
         self.data_queue = data_queue
         self.db_path = db_path
         self.logger = logger
-        self.db = Database(db_path=self.db_path, logger=self.logger)
+        self.db = ASDatabase(db_path=self.db_path, logger=self.logger)
 
     async def process_data(self):
         """
