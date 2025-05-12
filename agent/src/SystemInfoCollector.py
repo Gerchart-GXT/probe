@@ -116,5 +116,5 @@ class SystemInfoCollector:
             "disk": self._disk_info,
             "network": self._network_info,
             "boot_time": self._boot_time,
-            "processes": self._processes
+            "processes": len(self._processes)
         }

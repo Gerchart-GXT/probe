@@ -2,5 +2,6 @@
     "server_url": "ws://127.0.0.1:9999",
     "secret": "your_secret_key",
     "collect_interval": 3,
-    "upload_interval": 3
+    "upload_interval": 3,
+    "local_server_id": ""
 }
