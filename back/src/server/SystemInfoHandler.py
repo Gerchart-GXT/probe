@@ -29,6 +29,7 @@ class SystemInfoHandler:
             self.logger.debug(f"Processing data: {data}")
 
             try:
+                pass
                 # 插入或更新服务器记录
                 server_id = self._insert_or_update_server(data)
 
@@ -46,7 +47,6 @@ class SystemInfoHandler:
         """
         # 从网络信息中提取 IP 地址
         ip_address = self._get_ip_address(data["network"])
-
         # 检查服务器是否已存在
         self.db.cursor.execute("SELECT id FROM servers WHERE ip_address = ?", (ip_address,))
         result = self.db.cursor.fetchone()
@@ -90,12 +90,11 @@ class SystemInfoHandler:
     def _get_ip_address(self, network_info: dict) -> str:
         """
         从网络信息中提取 IP 地址。
-
         :param network_info: 网络信息字典
         :return: IP 地址
         """
-        for interface, addrs in network_info.items():
-            for addr in addrs:
+        for interface, info in network_info.items():
+            for addr in info.get("addresses", []):  # 遍历每个网卡的 addresses 列表
                 if addr.get("ip") and addr["ip"] != "127.0.0.1":  # 忽略本地回环地址
                     return addr["ip"]
         return "0.0.0.0"  # 如果没有找到 IP 地址，返回默认值

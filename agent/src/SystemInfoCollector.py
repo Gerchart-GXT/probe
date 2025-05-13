@@ -5,9 +5,11 @@ import socket
 import json
 from collections import deque
 from Logger import Logger
+import time
+from collections import defaultdict, deque
 
 class SystemInfoCollector:
-    def __init__(self, logger:Logger):
+    def __init__(self, logger: Logger):
         self._platform = None
         self._version = None
         self._cpu_info = None
@@ -17,6 +19,63 @@ class SystemInfoCollector:
         self._boot_time = None
         self._processes = None
         self.logger = logger
+        self._network_io_history = defaultdict(deque)  # 用于存储每个网卡的 I/O 历史数据
+
+    def _get_network_io_stats(self):
+        self.logger.debug("Get network I/O stats per interface")
+        io_counters = psutil.net_io_counters(pernic=True)  # 获取每个网卡的 I/O 统计信息
+        current_time = time.time()
+        network_io_stats = {}
+
+        for interface, counters in io_counters.items():
+            self._network_io_history[interface].append((current_time, counters.bytes_sent, counters.bytes_recv))
+
+            if len(self._network_io_history[interface]) == 2:
+                prev_time, prev_sent, prev_recv = self._network_io_history[interface][0]
+                curr_time, curr_sent, curr_recv = self._network_io_history[interface][1]
+
+                time_diff = curr_time - prev_time
+                sent_diff = curr_sent - prev_sent
+                recv_diff = curr_recv - prev_recv
+
+                upload_speed = sent_diff / time_diff  # 上传速度 (bytes/s)
+                download_speed = recv_diff / time_diff  # 下载速度 (bytes/s)
+
+                network_io_stats[interface] = {
+                    "upload_speed": upload_speed,
+                    "download_speed": download_speed,
+                    "total_upload": curr_sent,
+                    "total_download": curr_recv
+                }
+            else:
+                network_io_stats[interface] = {
+                    "upload_speed": 0,
+                    "download_speed": 0,
+                    "total_upload": counters.bytes_sent,
+                    "total_download": counters.bytes_recv
+                }
+
+        return network_io_stats
+
+    def _get_network_info(self):
+        self.logger.debug("Get network info with I/O stats")
+        network = {}
+        io_stats = self._get_network_io_stats()  # 获取每个网卡的 I/O 统计信息
+
+        for interface, addrs in psutil.net_if_addrs().items():
+            network[interface] = {
+                "addresses": [],
+                "io_stats": io_stats.get(interface, {})  # 合并 I/O 统计信息
+            }
+            for addr in addrs:
+                if addr.family == socket.AF_INET:
+                    network[interface]["addresses"].append({
+                        "ip": addr.address,
+                        "netmask": addr.netmask,
+                        "broadcast": addr.broadcast
+                    })
+
+        return network
 
     def _get_os_version(self):
         self.logger.debug("Get os version")
@@ -62,20 +121,6 @@ class SystemInfoCollector:
             })
         return disks
 
-    def _get_network_info(self):
-        self.logger.debug("Get network info")
-        network = {}
-        for interface, addrs in psutil.net_if_addrs().items():
-            network[interface] = []
-            for addr in addrs:
-                if addr.family == socket.AF_INET:
-                    network[interface].append({
-                        "ip": addr.address,
-                        "netmask": addr.netmask,
-                        "broadcast": addr.broadcast
-                    })
-        return network
-
     def _get_boot_time(self):
         self.logger.debug("Get boot time")
         boot_timestamp = psutil.boot_time()
@@ -101,7 +146,7 @@ class SystemInfoCollector:
         return processes
     
     def update_full_system_info(self):
-        self.logger.info("Update full system info")   
+        self.logger.info("Update full system info")
         self._platform = platform.system()
         self._version = self._get_os_version()
         self._cpu_info = self._get_cpu_info()
@@ -112,7 +157,7 @@ class SystemInfoCollector:
         self._processes = self._get_process_list()
 
     def get_full_system_info(self):
-        self.logger.info("Get full system info")   
+        self.logger.info("Get full system info")
         return {
             "platform": self._platform,
             "version": self._version,

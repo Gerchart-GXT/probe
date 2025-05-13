@@ -11,6 +11,7 @@ from RealTimeDataSend import RealTimeDataSend
 import threading
 import time
 from datetime import datetime, timedelta, timezone
+from PerformanceMonitor import PerformanceMonitor
 
 app = Flask(__name__)
 CORS(app)
@@ -20,6 +21,7 @@ AS_HOST = "0.0.0.0"  # 监控数据收集服务器绑定的主机地址
 AS_PORT = 8888       # 监控数据收集服务器绑定的端口
 SECRET = "your_secret_key"  # 用于JWT的密钥
 DB_PATH = "user-server.db"  # SQLite 数据库文件路径
+THRESHOLD_CONDIG = "thresholds.json" 
 FLASK_HOST = "0.0.0.0"  # Flask 服务器绑定的主机地址
 FLASK_PORT = 7777       # Flask 服务器绑定的端口
 
@@ -46,27 +48,23 @@ db = USDatabase(DB_PATH, logger)
 
 agent = AgentDataRequest(AS_HOST, AS_PORT, db, logger)
 
-# 获取并存储性能数据
-# start_time = "2023-10-01 00:00:00"
-# end_time = "2025-10-01 23:59:59"
-# agent.fetch_and_store_servers()
-# agent.fetch_and_store_performance_data(start_time, end_time)
+monitor = PerformanceMonitor(logger, db, config_path=THRESHOLD_CONDIG)
 
 def agent_data_update():
-    """后台数据获取任务（每5分钟执行一次）"""
     while True:
         try:
             # 获取并存储服务器信息
             agent.fetch_and_store_servers()
-            
 
             end_time = datetime.now(timezone.utc)
             start_time = end_time - timedelta(seconds=AGENT_DATA_UPDATE_INT)
             start_str = start_time.strftime("%Y-%m-%d %H:%M:%S")
             end_str = end_time.strftime("%Y-%m-%d %H:%M:%S")
             agent.fetch_and_store_servers()
-            agent.fetch_and_store_performance_data(start_str, end_str)
-            
+            new_performance_data = agent.fetch_and_store_performance_data(start_str, end_str)
+            for data in new_performance_data:
+                monitor.save_alert_to_db(data)
+                
             logger.info(f"Agent data updating finished, next updating time is {end_time + timedelta(seconds=AGENT_DATA_UPDATE_INT)}")
         except Exception as e:
             logger.error(f"Agent data updating failed: {e}")

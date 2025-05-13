@@ -113,6 +113,8 @@ class AgentDataRequest:
             self.insert_servers(new_servers)
         else:
             self.logger.info("No new server data to insert.")
+        return new_servers
+        
 
     def request_performance_data(self, start_time: str, end_time: str) -> Optional[List[Dict]]:
         """
@@ -200,7 +202,7 @@ class AgentDataRequest:
         """
         # 请求性能数据
         performance_data = self.request_performance_data(start_time, end_time)
-        self.logger.debug(f"New performance data is {performance_data}")
+        # self.logger.debug(f"New performance data is {performance_data}")
         if not performance_data:
             self.logger.error("No performance data fetched.")
             return
@@ -210,7 +212,8 @@ class AgentDataRequest:
         if not new_data:
             self.logger.info("No new performance data to insert.")
             return
-        self.logger.debug(f"New performance data fetch: {new_data}")
+        # self.logger.debug(f"New performance data fetch: {new_data}")
 
         # 插入新数据
         self.insert_performance_data(new_data)
+        return new_data

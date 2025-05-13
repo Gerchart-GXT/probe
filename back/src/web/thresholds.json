@@ -1,0 +1,7 @@
+{
+    "cpu_threshold": 80,
+    "memory_threshold": 80,
+    "disk_threshold": 80,
+    "upload_threshold": 1073741824, 
+    "download_threshold": 1073741824
+}

@@ -52,4 +52,17 @@
 | `boot_time`    | `DATETIME`     | 服务器启动时间           |
 | `processes`    | `TEXT`         | 进程信息（JSON 格式）    |
 
+#### 5. 报警信息表结构
+
+| 字段名           | 数据类型       | 说明                     |
+|------------------|----------------|--------------------------|
+| `id`             | `INTEGER`      | 报警记录唯一标识，自增   |
+| `server_id`      | `INTEGER`      | 外键，关联 `servers` 表  |
+| `timestamp`      | `DATETIME`     | 报警时间戳               |
+| `cpu_alert`      | `TEXT`         | CPU 报警信息（JSON 格式）|
+| `memory_alert`   | `TEXT`         | 内存报警信息（JSON 格式）|
+| `disk_alert`     | `TEXT`         | 磁盘报警信息（JSON 格式）|
+| `network_alert`  | `TEXT`         | 网络报警信息（JSON 格式）|
+| `is_valid_alert` | `BOOLEAN`      | 是否是有效报警           |
+
 ---
