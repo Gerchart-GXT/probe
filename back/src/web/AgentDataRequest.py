@@ -39,30 +39,30 @@ class AgentDataRequest:
 
     def handle_servers(self, servers: List[Dict]) -> List[Dict]:
         """
-        处理服务器信息，过滤掉重复记录。
+        处理服务器信息，更新已存在记录的 `last_seen` 字段。
 
         :param servers: 从监控服务器获取的服务器信息
-        :return: 去重后的服务器信息列表
+        :return: 处理后的服务器信息列表
         """
-        new_servers = []
         for server in servers:
-            # 检查是否已存在相同记录
-            exists = self.db.execute_query(
-                "SELECT 1 FROM servers WHERE ip_address = ?",
-                (server["ip_address"],),
-                fetch=True
+            # 更新 `last_seen` 字段
+            self.db.execute_query(
+                """
+                UPDATE servers
+                SET last_seen = ?
+                WHERE ip_address = ?
+                """,
+                (server["last_seen"], server["ip_address"])
             )
-            if not exists:
-                new_servers.append(server)
-            else:
-                self.logger.debug(f"Duplicate server skipped: ip_address={server['ip_address']}")
-        return new_servers
+            self.logger.debug(f"Updated last_seen for server: ip_address={server['ip_address']}")
+
+        return servers
 
     def insert_servers(self, servers: List[Dict]):
         """
         将服务器信息插入数据库。
 
-        :param servers: 去重后的服务器信息列表
+        :param servers: 服务器信息列表
         """
         for server in servers:
             self.db.execute_query(
@@ -93,14 +93,26 @@ class AgentDataRequest:
             self.logger.error("No server data fetched.")
             return
 
-        # 处理数据，去重
-        new_servers = self.handle_servers(servers)
-        if not new_servers:
-            self.logger.info("No new server data to insert.")
-            return
+        # 处理数据，更新 `last_seen` 字段
+        self.handle_servers(servers)
+
+        # 过滤出新服务器（不存在于数据库中的记录）
+        new_servers = []
+        for server in servers:
+            exists = self.db.execute_query(
+                "SELECT 1 FROM servers WHERE ip_address = ?",
+                (server["ip_address"],),
+                fetch=True
+            )
+            if not exists:
+                new_servers.append(server)
 
         # 插入新数据
-        self.insert_servers(new_servers)
+        if new_servers:
+            self.logger.debug(f"New Server fetch: {new_servers}")
+            self.insert_servers(new_servers)
+        else:
+            self.logger.info("No new server data to insert.")
 
     def request_performance_data(self, start_time: str, end_time: str) -> Optional[List[Dict]]:
         """
@@ -188,6 +200,7 @@ class AgentDataRequest:
         """
         # 请求性能数据
         performance_data = self.request_performance_data(start_time, end_time)
+        self.logger.debug(f"New performance data is {performance_data}")
         if not performance_data:
             self.logger.error("No performance data fetched.")
             return
@@ -197,6 +210,7 @@ class AgentDataRequest:
         if not new_data:
             self.logger.info("No new performance data to insert.")
             return
+        self.logger.debug(f"New performance data fetch: {new_data}")
 
         # 插入新数据
         self.insert_performance_data(new_data)

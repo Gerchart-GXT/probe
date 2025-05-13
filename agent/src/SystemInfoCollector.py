@@ -1,7 +1,7 @@
 import platform
 import psutil
+from datetime import datetime, timezone
 import socket
-from datetime import datetime
 import json
 from collections import deque
 from Logger import Logger
@@ -78,7 +78,12 @@ class SystemInfoCollector:
 
     def _get_boot_time(self):
         self.logger.debug("Get boot time")
-        return datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+        boot_timestamp = psutil.boot_time()
+        local_naive = datetime.fromtimestamp(boot_timestamp)
+        local_aware = local_naive.astimezone()
+        utc_aware = local_aware.astimezone(timezone.utc)
+        formatted_utc = utc_aware.strftime("%Y-%m-%d %H:%M:%S")
+        return formatted_utc
 
     def _get_process_list(self):
         self.logger.debug("Get process list")

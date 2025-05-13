@@ -5,10 +5,16 @@ from AgentDataRequest import AgentDataRequest
 from UserRnL import UserRnL
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_socketio import SocketIO, join_room, leave_room
 from UserSubHandle import UserSubHandle
+from RealTimeDataSend import RealTimeDataSend
+import threading
+import time
+from datetime import datetime, timedelta, timezone
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 AS_HOST = "0.0.0.0"  # 监控数据收集服务器绑定的主机地址
 AS_PORT = 8888       # 监控数据收集服务器绑定的端口
@@ -16,6 +22,8 @@ SECRET = "your_secret_key"  # 用于JWT的密钥
 DB_PATH = "user-server.db"  # SQLite 数据库文件路径
 FLASK_HOST = "0.0.0.0"  # Flask 服务器绑定的主机地址
 FLASK_PORT = 7777       # Flask 服务器绑定的端口
+
+AGENT_DATA_UPDATE_INT = 3
 
 # 初始化日志记录器
 LOG_CONFIG = {
@@ -43,6 +51,60 @@ agent = AgentDataRequest(AS_HOST, AS_PORT, db, logger)
 # end_time = "2025-10-01 23:59:59"
 # agent.fetch_and_store_servers()
 # agent.fetch_and_store_performance_data(start_time, end_time)
+
+def agent_data_update():
+    """后台数据获取任务（每5分钟执行一次）"""
+    while True:
+        try:
+            # 获取并存储服务器信息
+            agent.fetch_and_store_servers()
+            
+
+            end_time = datetime.now(timezone.utc)
+            start_time = end_time - timedelta(seconds=AGENT_DATA_UPDATE_INT)
+            start_str = start_time.strftime("%Y-%m-%d %H:%M:%S")
+            end_str = end_time.strftime("%Y-%m-%d %H:%M:%S")
+            agent.fetch_and_store_servers()
+            agent.fetch_and_store_performance_data(start_str, end_str)
+            
+            logger.info(f"Agent data updating finished, next updating time is {end_time + timedelta(seconds=AGENT_DATA_UPDATE_INT)}")
+        except Exception as e:
+            logger.error(f"Agent data updating failed: {e}")
+        time.sleep(AGENT_DATA_UPDATE_INT)
+
+# 初始化 RealTimeDataSend
+real_time_data_send = RealTimeDataSend(db, logger, socketio)
+
+# WebSocket 连接事件
+@socketio.on("connect")
+def handle_connect():
+    user_id = request.args.get("user_id")
+    if not user_id:
+        logger.warning("No user_id provided in WebSocket connection.")
+        return False
+
+    # 加入用户专属的房间
+    join_room(str(user_id))
+    logger.info(f"User {user_id} connected to WebSocket.")
+
+    # 启动数据发送
+    real_time_data_send.start_sending_data(int(user_id))
+
+# WebSocket 断开连接事件
+@socketio.on("disconnect")
+def handle_disconnect():
+    logger.debug("connect")
+    user_id = request.args.get("user_id")
+    if not user_id:
+        logger.warning("No user_id provided in WebSocket disconnection.")
+        return
+
+    # 离开用户专属的房间
+    leave_room(str(user_id))
+    logger.info(f"User {user_id} disconnected from WebSocket.")
+
+    # 停止数据发送
+    real_time_data_send.stop_sending_data(int(user_id))
 
 # 初始化 UserRnL
 user_rnl = UserRnL(db, logger, secret_key=SECRET)
@@ -127,6 +189,11 @@ def update_subscription(subscription_id):
     result = user_sub_handle.update_subscription(subscription_id, tags, notes)
     return jsonify(result), 200 if result["status"] else 400
 
+
+
 # 启动 Flask 应用
 if __name__ == "__main__":
-    app.run(host=FLASK_HOST, port=FLASK_PORT, debug=True)
+    agent_data_update_thread = threading.Thread(target=agent_data_update)
+    agent_data_update_thread.daemon = True  # 设置为守护线程（随主线程退出）
+    agent_data_update_thread.start()
+    socketio.run(app, host=FLASK_HOST, port=FLASK_PORT, debug=True)

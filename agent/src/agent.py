@@ -61,8 +61,6 @@ def main():
     logger = Logger(**LOG_CONFIG)
     app = MainApp('config.json', logger)
     asyncio.run(app.run())
-    # info_collector.update_full_system_info()
-    # print(info_collector.get_full_system_info())
 
 
 if __name__ == "__main__":

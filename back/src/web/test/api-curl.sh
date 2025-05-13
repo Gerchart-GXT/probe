@@ -14,6 +14,6 @@ curl -X POST http://localhost:7777/api/subscriptions \
 
 curl -X DELETE http://localhost:7777/api/subscriptions/1
 
-curl -X PUT http://localhost:7777/api/subscriptions/1 \
+curl -X PUT http://localhost:7777/api/subscriptions/2 \
 -H "Content-Type: application/json" \
 -d '{"tags": ["fuck", "me", "please"], "notes": "Updated notes"}'
