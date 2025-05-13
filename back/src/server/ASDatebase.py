@@ -144,28 +144,29 @@ class ASDatabase:
 
     def get_servers(self):
         """
-        返回已记录的服务器信息。
-
-        :return: 服务器信息列表
+        返回已记录的服务器信息，每条记录以字典形式返回。
+        :return: 服务器信息列表，每个元素是一个字典
         """
         with self.lock:  # 加锁
             try:
                 self.cursor.execute("SELECT * FROM servers")
+                columns = [column[0] for column in self.cursor.description]  # 获取字段名
                 servers = self.cursor.fetchall()
+                # 将每条记录转换为字典
+                servers_dict = [dict(zip(columns, row)) for row in servers]
                 self.logger.info("Fetched server records")
-                return servers
+                return servers_dict
             except sqlite3.Error as e:
                 self.logger.error(f"Error fetching server records: {e}")
                 return []
 
     def get_performance_data(self, server_id: int, start_time: str, end_time: str):
         """
-        返回指定时间戳范围内的性能记录信息。
-
+        返回指定时间戳范围内的性能记录信息，每条记录以字典形式返回。
         :param server_id: 服务器 ID
         :param start_time: 开始时间（格式：'YYYY-MM-DD HH:MM:SS'）
         :param end_time: 结束时间（格式：'YYYY-MM-DD HH:MM:SS'）
-        :return: 性能数据列表
+        :return: 性能数据列表，每个元素是一个字典
         """
         with self.lock:  # 加锁
             try:
@@ -173,9 +174,12 @@ class ASDatabase:
                     SELECT * FROM performance_data
                     WHERE server_id = ? AND timestamp BETWEEN ? AND ?
                 """, (server_id, start_time, end_time))
+                columns = [column[0] for column in self.cursor.description]  # 获取字段名
                 performance_data = self.cursor.fetchall()
+                # 将每条记录转换为字典
+                performance_data_dict = [dict(zip(columns, row)) for row in performance_data]
                 self.logger.info(f"Fetched performance data for server ID: {server_id} between {start_time} and {end_time}")
-                return performance_data
+                return performance_data_dict
             except sqlite3.Error as e:
                 self.logger.error(f"Error fetching performance data: {e}")
                 return []

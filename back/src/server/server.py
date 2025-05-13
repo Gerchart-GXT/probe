@@ -15,7 +15,7 @@ import threading
 HOST = "0.0.0.0"  # WebSocket 服务器绑定的主机地址
 PORT = 9999       # WebSocket 服务器绑定的端口
 SECRET = "your_secret_key"  # 用于验证客户端的密钥
-DB_PATH = "monitoring_system.db"  # SQLite 数据库文件路径
+DB_PATH = "agent-server.db"  # SQLite 数据库文件路径
 FLASK_HOST = "0.0.0.0"  # Flask 服务器绑定的主机地址
 FLASK_PORT = 8888       # Flask 服务器绑定的端口
 
@@ -85,7 +85,8 @@ def get_performance():
     performance_data = []
     servers = db.get_servers()
     for server in servers:
-        server_id = server[0]
+        logger.debug(server)
+        server_id = server["id"]
         data = db.get_performance_data(server_id=server_id, start_time=start_time, end_time=end_time)
         performance_data.extend(data)
 

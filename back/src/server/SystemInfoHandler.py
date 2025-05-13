@@ -22,6 +22,7 @@ class SystemInfoHandler:
         从队列中获取数据并存储到数据库中。
         """
         self.db.connect()  # 连接到数据库
+        self.db.create_tables() # 创建数据库表
         while True:
             # 从队列中获取数据（阻塞操作）
             data = await self.data_queue.get()
