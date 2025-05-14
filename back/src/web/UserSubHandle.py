@@ -48,7 +48,6 @@ class UserSubHandle:
     def add_subscription(self, user_id: int, server_id: int, tags: List[str], notes: str) -> Dict:
         """
         为某个用户添加某台未订阅服务器。
-
         :param user_id: 用户 ID
         :param server_id: 服务器 ID
         :param tags: 服务器标签
@@ -82,9 +81,25 @@ class UserSubHandle:
             "INSERT INTO subscriptions (user_id, server_id, tags, notes) VALUES (?, ?, ?, ?)",
             (user_id, server_id, ",".join(tags), notes),
         )
-        subscription_id = self.db.execute_query("SELECT last_insert_rowid()", fetch=True)[0]["last_insert_rowid()"]
-        self.logger.info(f"User {user_id} subscribed to server {server_id} successfully.")
-        return {"status": True, "message": "Server subscribed successfully", "subscription_id": subscription_id}
+
+        # 查询刚刚插入的订阅记录
+        new_subscription = self.db.execute_query(
+            "SELECT id FROM subscriptions WHERE user_id = ? AND server_id = ?",
+            (user_id, server_id),
+            fetch=True,
+        )
+
+        if not new_subscription:
+            self.logger.error(f"Failed to retrieve subscription ID for user {user_id} and server {server_id}.")
+            return {"status": False, "message": "Failed to add subscription"}
+
+        subscription_id = new_subscription[0]["id"]
+        self.logger.info(f"User {user_id} subscribed to server {server_id} successfully. Subscription ID: {subscription_id}")
+        return {
+            "status": True,
+            "message": "Server subscribed successfully",
+            "subscription_id": subscription_id,
+        }
 
     def delete_subscription(self, subscription_id: int) -> Dict:
         """

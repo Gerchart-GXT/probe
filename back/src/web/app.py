@@ -1,4 +1,5 @@
 from Logger import Logger
+import json
 import logging
 from USDatabase import USDatabase
 from AgentDataRequest import AgentDataRequest
@@ -64,7 +65,7 @@ def agent_data_update():
             new_performance_data = agent.fetch_and_store_performance_data(start_str, end_str)
             for data in new_performance_data:
                 monitor.save_alert_to_db(data)
-                
+
             logger.info(f"Agent data updating finished, next updating time is {end_time + timedelta(seconds=AGENT_DATA_UPDATE_INT)}")
         except Exception as e:
             logger.error(f"Agent data updating failed: {e}")
@@ -188,6 +189,155 @@ def update_subscription(subscription_id):
     return jsonify(result), 200 if result["status"] else 400
 
 
+@app.route("/api/servers", methods=["GET"])
+def get_all_servers():
+    """获取所有服务器基础信息（带字段说明）"""
+    logger.info("Fetching all server information with explicit fields")
+    try:
+        query = """
+            SELECT 
+                id,
+                server_name AS name,
+                platform,
+                version,
+                ip_address AS ip,
+                status,
+                last_seen,
+                server_notes AS notes
+            FROM servers 
+            ORDER BY id ASC
+        """
+        servers = db.execute_query(query, fetch=True)
+        return jsonify({
+            "status": True,
+            "data": servers if servers else []
+        }), 200
+    except Exception as e:
+        logger.error(f"Error fetching servers: {str(e)}")
+        return jsonify({
+            "status": False,
+            "message": "Failed to fetch server information"
+        }), 500
+
+# 获取指定服务器性能数据接口
+@app.route("/api/performance-data", methods=["GET"])
+def get_performance_data():
+    """获取指定时间范围的性能数据"""
+    # 参数校验
+    server_id = request.args.get("server_id")
+    start_time = request.args.get("start_time")
+    end_time = request.args.get("end_time")
+    
+    if not all([server_id, start_time, end_time]):
+        logger.warning("Missing parameters in performance data request")
+        return jsonify({
+            "status": False,
+            "message": "server_id, start_time and end_time are required"
+        }), 400
+
+    logger.info(f"Fetching performance data for server:{server_id} [{start_time} - {end_time}]")
+    
+    try:
+        # 执行查询
+        query = """
+            SELECT id, server_id, timestamp, 
+                   cpu_info, memory_info, disk_info, 
+                   network_info, boot_time, processes
+            FROM performance_data
+            WHERE server_id = ? 
+            AND timestamp BETWEEN ? AND ?
+            ORDER BY timestamp DESC
+        """
+        params = (int(server_id), start_time, end_time)
+        results = db.execute_query(query, params, fetch=True)
+        
+        # 处理JSON字符串字段
+        formatted_results = []
+        for record in results:
+            formatted = dict(record)
+            # 转换所有JSON字符串字段为字典
+            for json_field in ['cpu_info', 'memory_info', 'disk_info', 'network_info', 'processes']:
+                if formatted.get(json_field):
+                    formatted[json_field] = json.loads(formatted[json_field])
+            formatted_results.append(formatted)
+        
+        return jsonify({
+            "status": True,
+            "data": formatted_results
+        }), 200
+        
+    except ValueError:
+        logger.warning(f"Invalid server_id format: {server_id}")
+        return jsonify({
+            "status": False,
+            "message": "Invalid server_id format"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error fetching performance data: {str(e)}")
+        return jsonify({
+            "status": False,
+            "message": "Failed to fetch performance data"
+        }), 500
+
+# 获取指定服务器报警信息接口
+@app.route("/api/alerts", methods=["GET"])
+def get_server_alerts():
+    """获取指定时间范围的报警信息"""
+    # 参数校验
+    server_id = request.args.get("server_id")
+    start_time = request.args.get("start_time")
+    end_time = request.args.get("end_time")
+    
+    if not all([server_id, start_time, end_time]):
+        logger.warning("Missing parameters in alerts request")
+        return jsonify({
+            "status": False,
+            "message": "server_id, start_time and end_time are required"
+        }), 400
+
+    logger.info(f"Fetching alerts for server:{server_id} [{start_time} - {end_time}]")
+    
+    try:
+        # 执行查询
+        query = """
+            SELECT id, server_id, timestamp, 
+                   cpu_alert, memory_alert, 
+                   disk_alert, network_alert, is_valid_alert
+            FROM alerts
+            WHERE server_id = ? 
+            AND timestamp BETWEEN ? AND ?
+            ORDER BY timestamp DESC
+        """
+        params = (int(server_id), start_time, end_time)
+        results = db.execute_query(query, params, fetch=True)
+        
+        # 处理JSON字符串字段
+        formatted_results = []
+        for record in results:
+            formatted = dict(record)
+            # 转换所有JSON字符串报警字段为字典
+            for alert_field in ['cpu_alert', 'memory_alert', 'disk_alert', 'network_alert']:
+                if formatted.get(alert_field):
+                    formatted[alert_field] = json.loads(formatted[alert_field])
+            formatted_results.append(formatted)
+        
+        return jsonify({
+            "status": True,
+            "data": formatted_results
+        }), 200
+        
+    except ValueError:
+        logger.warning(f"Invalid server_id format: {server_id}")
+        return jsonify({
+            "status": False,
+            "message": "Invalid server_id format"
+        }), 400
+    except Exception as e:
+        logger.error(f"Error fetching alerts: {str(e)}")
+        return jsonify({
+            "status": False,
+            "message": "Failed to fetch alerts"
+        }), 500
 
 # 启动 Flask 应用
 if __name__ == "__main__":
