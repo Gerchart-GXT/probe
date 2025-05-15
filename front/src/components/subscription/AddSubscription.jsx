@@ -6,6 +6,8 @@ import { ErrorMessage } from '../common';
 import './AddSubscription.css';
 
 const AddSubscription = ({ availableServers, onSubscriptionAdded, onCancel }) => {
+  console.log(availableServers);
+  
   const { user } = useAuth();
   const [serverId, setServerId] = useState(availableServers.length > 0 ? availableServers[0].id : '');
   const [tags, setTags] = useState('');
@@ -88,12 +90,16 @@ const AddSubscription = ({ availableServers, onSubscriptionAdded, onCancel }) =>
             disabled={isLoading}
             required
           >
+            <option value="">-- 选择服务器 --</option>
             {availableServers.map(server => (
               <option key={server.id} value={server.id}>
                 {server.name} ({server.ip}) - {server.status === 'online' ? '在线' : '离线'}
               </option>
             ))}
           </select>
+          {/* {availableServers.length === 0 && (
+              <p className="no-servers-message">没有可用的服务器</p>
+          )} */}
         </div>
         
         <div className="form-group">
@@ -133,6 +139,8 @@ const AddSubscription = ({ availableServers, onSubscriptionAdded, onCancel }) =>
             type="submit"
             className="button primary"
             disabled={isLoading}
+            onClick={onSubscriptionAdded}
+
           >
             {isLoading ? '添加中...' : '添加订阅'}
           </button>
