@@ -1,0 +1,92 @@
+// src/components/performance/DiskChart.jsx
+import React from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import './Charts.css';
+
+const DiskChart = ({ data }) => {
+  // 格式化X轴时间戳
+  const formatXAxis = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+  // 格式化磁盘大小
+  const formatDiskSize = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // 自定义Tooltip内容
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const date = new Date(label);
+      const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+      const diskInfo = payload[0].payload;
+      
+      return (
+        <div className="custom-tooltip">
+          <p className="tooltip-time">{formattedDate}</p>
+          <p className="tooltip-label">挂载点: {diskInfo.mountpoint}</p>
+          <p className="tooltip-value">
+            磁盘使用率: <span className="disk-percent">{payload[0].value.toFixed(2)}%</span>
+          </p>
+          <p className="tooltip-value">
+            已用空间: <span className="disk-used">{formatDiskSize(diskInfo.used)}</span>
+          </p>
+          <p className="tooltip-value">
+            总空间: <span className="disk-total">{formatDiskSize(diskInfo.total)}</span>
+          </p>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
+  return (
+    <div className="chart-wrapper">
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+            dataKey="timestamp" 
+            tickFormatter={formatXAxis} 
+            label={{ value: '时间', position: 'insideBottomRight', offset: 0 }}
+          />
+          <YAxis 
+            domain={[0, 100]} 
+            label={{ value: '使用率 (%)', angle: -90, position: 'insideLeft' }} 
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Line 
+            type="monotone" 
+            dataKey="percent" 
+            name="磁盘使用率" 
+            stroke="#ff7300" 
+            activeDot={{ r: 8 }} 
+            isAnimationActive={true}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export default DiskChart;

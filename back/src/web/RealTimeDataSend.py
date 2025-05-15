@@ -7,7 +7,7 @@ from Logger import Logger
 from USDatabase import USDatabase
 
 class RealTimeDataSend:
-    def __init__(self, db: USDatabase, logger: Logger, socketio: SocketIO, interval: int = 1):  # 添加 flask_app 参数
+    def __init__(self, db: USDatabase, logger: Logger, socketio: SocketIO, interval: int = 3):  # 添加 flask_app 参数
         """
         初始化 RealTimeDataSend 类。
 

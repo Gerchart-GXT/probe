@@ -29,24 +29,24 @@ class SystemInfoCollector:
 
         for interface, counters in io_counters.items():
             self._network_io_history[interface].append((current_time, counters.bytes_sent, counters.bytes_recv))
-
+            
             if len(self._network_io_history[interface]) == 2:
                 prev_time, prev_sent, prev_recv = self._network_io_history[interface][0]
                 curr_time, curr_sent, curr_recv = self._network_io_history[interface][1]
-
                 time_diff = curr_time - prev_time
                 sent_diff = curr_sent - prev_sent
                 recv_diff = curr_recv - prev_recv
 
                 upload_speed = sent_diff / time_diff  # 上传速度 (bytes/s)
                 download_speed = recv_diff / time_diff  # 下载速度 (bytes/s)
-
+                # self.logger.info(f"{upload_speed / 1024 / 1024}, {download_speed / 1024 / 1024}")
                 network_io_stats[interface] = {
                     "upload_speed": upload_speed,
                     "download_speed": download_speed,
                     "total_upload": curr_sent,
                     "total_download": curr_recv
                 }
+                self._network_io_history[interface].popleft()
             else:
                 network_io_stats[interface] = {
                     "upload_speed": 0,

@@ -1,0 +1,370 @@
+/* src/components/dashboard/ServerList.css */
+.server-list-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.server-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.server-list-title {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.manage-button {
+  padding: 8px 16px;
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.manage-button:hover {
+  background-color: #e67e22;
+}
+
+.no-subscriptions-container {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.no-subscriptions-message {
+  margin-bottom: 16px;
+  color: #7f8c8d;
+}
+
+.add-server-button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-server-button:hover {
+  background-color: #2980b9;
+}
+
+.server-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button.primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.button.primary:hover {
+  background-color: #2980b9;
+}
+
+.button.secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.button.secondary:hover {
+  background-color: #7f8c8d;
+}
+
+.button.danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.button.danger:hover {
+  background-color: #c0392b;
+}
+
+.button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.server-info-summary {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.server-info-summary h3 {
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.server-info-summary p {
+  margin: 0;
+  color: #666;
+}
+
+.subscription-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subscription-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.subscription-info h4 {
+  margin: 0 0 4px;
+  color: #333;
+}
+
+.subscription-info p {
+  margin: 0;
+  color: #666;
+}
+.server-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 4px solid #bdc3c7;
+}
+
+.server-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.server-card.status-online {
+  border-top-color: #2ecc71;
+}
+
+.server-card.status-offline {
+  border-top-color: #e74c3c;
+}
+
+.server-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.server-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.server-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-indicator.status-online {
+  background-color: #2ecc71;
+  box-shadow: 0 0 5px #2ecc71;
+}
+
+.status-indicator.status-offline {
+  background-color: #e74c3c;
+  box-shadow: 0 0 5px #e74c3c;
+}
+
+.status-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.server-info {
+  padding: 16px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  width: 80px;
+  font-weight: 500;
+  color: #7f8c8d;
+  flex-shrink: 0;
+}
+
+.info-value {
+  flex: 1;
+  color: #333;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 4px;
+}
+
+.tag-empty {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+.performance-data {
+  padding: 16px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.performance-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: #333;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.performance-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.perf-label {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 4px;
+}
+
+.perf-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.server-card-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.edit-button {
+  background-color: #f39c12;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #e67e22;
+}
+
+.details-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.details-button:hover {
+  background-color: #2980b9;
+}

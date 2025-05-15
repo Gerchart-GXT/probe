@@ -1,0 +1,26 @@
+/* src/styles/pages/Login.css */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: var(--background-color);
+}
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+@media (max-width: 480px) {
+  .login-content {
+    padding: 20px;
+  }
+}

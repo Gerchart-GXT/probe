@@ -27,6 +27,7 @@ FLASK_HOST = "0.0.0.0"  # Flask 服务器绑定的主机地址
 FLASK_PORT = 7777       # Flask 服务器绑定的端口
 
 AGENT_DATA_UPDATE_INT = 3
+WS_DATA_SENT_INT = 3
 
 # 初始化日志记录器
 LOG_CONFIG = {
@@ -72,7 +73,7 @@ def agent_data_update():
         time.sleep(AGENT_DATA_UPDATE_INT)
 
 # 初始化 RealTimeDataSend
-real_time_data_send = RealTimeDataSend(db, logger, socketio)
+real_time_data_send = RealTimeDataSend(db, logger, socketio, WS_DATA_SENT_INT)
 
 # WebSocket 连接事件
 @socketio.on("connect")

@@ -1,0 +1,94 @@
+/* src/components/performance/Charts.css */
+.chart-wrapper {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.custom-tooltip {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+}
+
+.tooltip-time {
+  margin: 0 0 8px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.tooltip-label {
+  margin: 5px 0;
+  color: #666;
+}
+
+.tooltip-value {
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  min-width: 200px;
+}
+
+.cpu-value {
+  color: #8884d8;
+  font-weight: bold;
+}
+
+.memory-percent {
+  color: #82ca9d;
+  font-weight: bold;
+}
+
+.memory-used, .memory-total {
+  color: #666;
+  font-weight: bold;
+}
+
+.disk-percent {
+  color: #ff7300;
+  font-weight: bold;
+}
+
+.disk-used, .disk-total {
+  color: #666;
+  font-weight: bold;
+}
+
+.upload-speed {
+  color: #8884d8;
+  font-weight: bold;
+}
+
+.download-speed {
+  color: #82ca9d;
+  font-weight: bold;
+}
+
+.total-upload, .total-download {
+  color: #666;
+  font-weight: bold;
+}
+
+.chart-controls {
+  display: flex;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.chart-control-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.chart-control-item input {
+  cursor: pointer;
+}

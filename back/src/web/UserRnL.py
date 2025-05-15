@@ -90,4 +90,4 @@ class UserRnL:
             algorithm="HS256",
         )
         self.logger.info(f"User {username} logged in successfully.")
-        return {"access_token": token}
+        return {"user_id": user["id"], "access_token": token, "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=self.token_expiry)}

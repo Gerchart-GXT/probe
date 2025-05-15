@@ -1,0 +1,144 @@
+/* src/components/subscription/SubscriptionManager.css */
+.subscription-manager {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subscription-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.subscription-manager-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 22px;
+}
+
+.add-button {
+  padding: 8px 16px;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #27ae60;
+}
+
+.add-button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.no-subscriptions {
+  padding: 40px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.no-subscriptions p {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+.subscriptions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subscription-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+}
+
+.subscription-info h3 {
+  margin: 0 0 8px;
+  color: #333;
+  font-size: 18px;
+}
+
+.subscription-info p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.info-label {
+  font-weight: 500;
+  margin-right: 8px;
+  color: #7f8c8d;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.status-badge.online {
+  background-color: #2ecc71;
+}
+
+.status-badge.offline {
+  background-color: #e74c3c;
+}
+
+.status-badge.unknown {
+  background-color: #95a5a6;
+}
+
+.subscription-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button {
+  padding: 6px 12px;
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+  background-color: #e67e22;
+}
+
+.remove-button {
+  padding: 6px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+  background-color: #c0392b;
+}
