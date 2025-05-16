@@ -8,7 +8,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <p>&copy; {currentYear} 服务器探针系统. 保留所有权利.</p>
+        <p>&copy; {currentYear} 服务器探针系统 用于张慧子毕设.</p>
         <div className="footer-links">
           <a href="/about">关于我们</a>
           <a href="/privacy">隐私政策</a>

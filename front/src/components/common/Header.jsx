@@ -55,8 +55,8 @@ const Header = () => {
     <header className="header">
       <div className="header-left">
         <Link to="/" className="logo-container">
-          <img src="https://picture.imgxt.com/local/1/2025/03/11/67cfa8542c0fa.jpg" alt="Logo" className="logo" />
-          <h1 className="app-title">服务器探针</h1>
+          <img src="https://picture.imgxt.com/local/1/2025/05/16/6826dc6418d24.png" alt="Logo" className="logo" />
+          <h1 className="app-title">服务器探针——ZHZ</h1>
         </Link>
       </div>
       <div className="header-center">
@@ -70,7 +70,7 @@ const Header = () => {
               onClick={() => navigate('/alerts')}
             >
               <img 
-                src={'https://picture.imgxt.com/local/1/2025/03/11/67cfa8542c0fa.jpg'} 
+                src={'https://picture.imgxt.com/local/1/2025/05/16/6826dcd4f07d8.png'} 
                 alt={user.username} 
               />
               {unreadCount > 0 && (

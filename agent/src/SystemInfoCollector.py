@@ -42,7 +42,7 @@ class SystemInfoCollector:
                 # self.logger.info(f"{upload_speed / 1024 / 1024}, {download_speed / 1024 / 1024}")
                 network_io_stats[interface] = {
                     "upload_speed": upload_speed,
-                    "download_speed": download_speed,
+                    "dwnload_speeod": download_speed,
                     "total_upload": curr_sent,
                     "total_download": curr_recv
                 }

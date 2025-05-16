@@ -5,7 +5,7 @@ import { subscribeToServer } from '../../api';
 import { ErrorMessage } from '../common';
 import './AddSubscription.css';
 
-const AddSubscription = ({ availableServers, onSubscriptionAdded, onCancel }) => {
+const AddSubscription = ({ availableServers, onSubscriptionAdded, onSubscriptionUpdated, onCancel }) => {
   console.log(availableServers);
   
   const { user } = useAuth();
@@ -41,6 +41,7 @@ const AddSubscription = ({ availableServers, onSubscriptionAdded, onCancel }) =>
       
       if (response && response.status) {
         onSubscriptionAdded();
+        onSubscriptionUpdated();
       } else {
         setError('添加订阅失败，请稍后再试');
       }

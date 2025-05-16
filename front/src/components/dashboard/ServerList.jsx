@@ -28,6 +28,7 @@ const ServerList = () => {
       if (subsResponse && subsResponse.status) {
         setSubscriptions(subsResponse.servers || []);
       }
+      
       // 获取所有服务器
       const serversResponse = await getAllServers(user.token);
       if (serversResponse && serversResponse.status) {
@@ -55,6 +56,7 @@ const ServerList = () => {
       const available = servers.filter(server => !subscribedServerIds.includes(server.id));
       setAvailableServers(available);
     }
+    
   }, [servers, subscriptions]);
 
   const handleManageSubscriptions = () => {
@@ -95,7 +97,8 @@ const ServerList = () => {
       return (
         <AddSubscription 
           availableServers={availableServers}
-          onSubscriptionAdded={handleSubscriptionUpdated}
+          onSubscriptionAdded={handleAddSubscription}
+          onSubscriptionUpdated={handleSubscriptionUpdated}
           onCancel={handleCloseManageModal}
         />
       );
